@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
+	"log"
 
 	"github.com/ava-labs/coreth/core"
 	"github.com/ava-labs/coreth/core/rawdb"
@@ -210,22 +211,15 @@ func (es *EventSystem) subscribe(sub *subscription) *Subscription {
 // given criteria to the given logs channel. Default value for the from and to
 // block is "latest". If the fromBlock > toBlock an error is returned.
 func (es *EventSystem) SubscribeLogs(crit ethereum.FilterQuery, logs chan []*types.Log) (*Subscription, error) {
+	log.Print("subscribeLogs")
 	var from, to rpc.BlockNumber
-	if crit.FromBlock == nil {
-		from = rpc.LatestBlockNumber
-	} else {
-		from = rpc.BlockNumber(crit.FromBlock.Int64())
-	}
-	if crit.ToBlock == nil {
-		to = rpc.LatestBlockNumber
-	} else {
-		to = rpc.BlockNumber(crit.ToBlock.Int64())
-	}
+	from = rpc.LatestBlockNumber
+	to = rpc.LatestBlockNumber
 
 	// only interested in pending logs
-// 	if from == rpc.PendingBlockNumber && to == rpc.PendingBlockNumber {
+	if from == rpc.PendingBlockNumber && to == rpc.PendingBlockNumber {
 		return es.subscribePendingLogs(crit, logs), nil
-// 	}
+	}
 	// only interested in new mined logs
 	if from == rpc.LatestBlockNumber && to == rpc.LatestBlockNumber {
 		return es.subscribeLogs(crit, logs), nil
@@ -246,6 +240,7 @@ func (es *EventSystem) SubscribeLogs(crit ethereum.FilterQuery, logs chan []*typ
 }
 
 func (es *EventSystem) SubscribeAcceptedLogs(crit ethereum.FilterQuery, logs chan []*types.Log) (*Subscription, error) {
+	log.Print("subscribeAcceptedLogs")
 	var from, to rpc.BlockNumber
 	if crit.FromBlock == nil {
 		from = rpc.LatestBlockNumber
