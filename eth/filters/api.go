@@ -271,16 +271,9 @@ func (api *PublicFilterAPI) Logs(ctx context.Context, crit FilterCriteria) (*rpc
 		err         error
 	)
 
-	if api.backend.GetVMConfig().AllowUnfinalizedQueries {
-		logsSub, err = api.events.SubscribeLogs(ethereum.FilterQuery(crit), matchedLogs)
-		if err != nil {
-			return nil, err
-		}
-	} else {
-		logsSub, err = api.events.SubscribeAcceptedLogs(ethereum.FilterQuery(crit), matchedLogs)
-		if err != nil {
-			return nil, err
-		}
+	logsSub, err = api.events.SubscribeLogs(ethereum.FilterQuery(crit), matchedLogs)
+	if err != nil {
+		return nil, err
 	}
 
 	go func() {
